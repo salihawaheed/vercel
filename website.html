@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HalalScanner — Instant Food & Additive Verification</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Remix Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet" />
+  
+  <style>
+    :root {
+      --primary: #047857;
+      --primary-dark: #065f46;
+      --primary-light: #ecfdf5;
+      --accent: #10b981;
+      --danger: #dc2626;
+      --danger-light: #fef2f2;
+      --warning: #d97706;
+      --warning-light: #fffbeb;
+      --gray-50: #f8fafc;
+      --gray-100: #f1f5f9;
+      --gray-200: #e2e8f0;
+      --gray-600: #475569;
+      --gray-900: #0f172a;
+      --white: #ffffff;
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+      --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.03);
+      --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.06);
+      --transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--gray-50);
+      color: var(--gray-900);
+      line-height: 1.6;
+    }
+
+    h1, h2, h3, h4 {
+      font-family: 'Outfit', sans-serif;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 1.25rem;
+    }
+
+    /* Navbar */
+    .navbar {
+      background: var(--white);
+      border-bottom: 1px solid var(--gray-200);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 70px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--primary);
+      text-decoration: none;
+    }
+
+    .brand i {
+      font-size: 1.6rem;
+      background: var(--primary-light);
+      padding: 0.35rem;
+      border-radius: 10px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 1.5rem;
+      list-style: none;
+    }
+
+    .nav-link {
+      text-decoration: none;
+      color: var(--gray-600);
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .nav-link:hover, .nav-link.active {
+      color: var(--primary);
+    }
+
+    /* Hero Section */
+    .hero {
+      background: linear-gradient(135deg, var(--primary) 0%, #064e3b 100%);
+      color: var(--white);
+      padding: 3.5rem 0;
+      text-align: center;
+      border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+      margin-bottom: 2rem;
+      box-shadow: var(--shadow-md);
+    }
+
+    .hero h1 {
+      font-size: clamp(2rem, 4vw, 2.8rem);
+      margin-bottom: 0.75rem;
+    }
+
+    .hero p {
+      color: #d1fae5;
+      max-width: 600px;
+      margin: 0 auto;
+      font-size: 1.05rem;
+    }
+
+    /* Main Grid Layout */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr 360px;
+      gap: 2rem;
+      padding-bottom: 4rem;
+    }
+
+    @media (max-width: 900px) {
+      .main-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background: var(--white);
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius-lg);
+      padding: 1.75rem;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 1.5rem;
+    }
+
+    .card h3 {
+      font-size: 1.25rem;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--gray-900);
+    }
+
+    /* Tabs inside scanner panel */
+    .scanner-tabs {
+      display: flex;
+      gap: 0.5rem;
+      background: var(--gray-100);
+      padding: 0.3rem;
+      border-radius: var(--radius-sm);
+      margin-bottom: 1.5rem;
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 0.6rem;
+      border: none;
+      background: transparent;
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: var(--gray-600);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .tab-btn.active {
+      background: var(--white);
+      color: var(--primary);
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* Form Inputs */
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      font-size: 0.88rem;
+      margin-bottom: 0.5rem;
+      color: var(--gray-600);
+    }
+
+    textarea, input[type="text"] {
+      width: 100%;
+      padding: 0.85rem 1rem;
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius-sm);
+      font-family: inherit;
+      font-size: 0.95rem;
+      outline: none;
+      transition: var(--transition);
+    }
+
+    textarea:focus, input[type="text"]:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--primary-light);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 120px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      background: var(--primary);
+      color: var(--white);
+      border: none;
+      padding: 0.8rem 1.5rem;
+      border-radius: var(--radius-sm);
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      width: 100%;
+      transition: var(--transition);
+    }
+
+    .btn:hover {
+      background: var(--primary-dark);
+    }
+
+    /* Barcode simulation box */
+    .barcode-box {
+      text-align: center;
+      padding: 2.5rem 1rem;
+      border: 2px dashed var(--gray-200);
+      border-radius: var(--radius-sm);
+      background: var(--gray-50);
+    }
+
+    .barcode-box i {
+      font-size: 2.5rem;
+      color: var(--primary);
+      margin-bottom: 0.5rem;
+    }
+
+    .sample-barcodes {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      justify-content: center;
+      margin-top: 1rem;
+    }
+
+    .badge-chip {
+      background: var(--white);
+      border: 1px solid var(--gray-200);
+      padding: 0.35rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      color: var(--gray-600);
+      transition: var(--transition);
+    }
+
+    .badge-chip:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+      background: var(--primary-light);
+    }
+
+    /* Results Box */
+    .result-box {
+      margin-top: 1.5rem;
+      padding: 1.25rem;
+      border-radius: var(--radius-sm);
+      display: none;
+    }
+
+    .result-box.halal {
+      background: var(--primary-light);
+      border: 1px solid var(--accent);
+      color: #064e3b;
+    }
+
+    .result-box.haram {
+      background: var(--danger-light);
+      border: 1px solid var(--danger);
+      color: #991b1b;
+    }
+
+    .result-box.mashbooh {
+      background: var(--warning-light);
+      border: 1px solid var(--warning);
+      color: #78350f;
+    }
+
+    .result-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .result-header i {
+      font-size: 1.4rem;
+    }
+
+    .flagged-list {
+      margin-top: 0.75rem;
+      padding-left: 1.25rem;
+      font-size: 0.9rem;
+    }
+
+    /* E-Number Reference Accordion / Search */
+    .search-sm {
+      margin-bottom: 1rem;
+    }
+
+    .enumber-list {
+      max-height: 380px;
+      overflow-y: auto;
+      padding-right: 0.25rem;
+    }
+
+    .enumber-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.65rem 0.75rem;
+      border-bottom: 1px solid var(--gray-100);
+      font-size: 0.9rem;
+    }
+
+    .enumber-item:last-child {
+      border-bottom: none;
+    }
+
+    .status-tag {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+
+    .status-tag.halal { background: var(--primary-light); color: var(--primary); }
+    .status-tag.haram { background: var(--danger-light); color: var(--danger); }
+    .status-tag.doubtful { background: var(--warning-light); color: var(--warning); }
+
+    /* History Sidebar */
+    .history-list {
+      list-style: none;
+      max-height: 320px;
+      overflow-y: auto;
+    }
+
+    .history-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.65rem 0;
+      border-bottom: 1px solid var(--gray-100);
+      font-size: 0.9rem;
+    }
+
+    .history-item span:first-child {
+      font-weight: 600;
+      color: var(--gray-900);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 180px;
+    }
+
+    .clear-history {
+      background: none;
+      border: none;
+      color: var(--danger);
+      font-size: 0.8rem;
+      font-weight: 650;
+      cursor: pointer;
+      margin-top: 0.75rem;
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 2rem 0;
+      color: var(--gray-600);
+      font-size: 0.9rem;
+      border-top: 1px solid var(--gray-200);
+      background: var(--white);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <header class="navbar">
+    <div class="container nav-container">
+      <a href="#" class="brand">
+        <i class="ri-shield-check-line"></i>
+        <span>HalalScanner</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="#" class="nav-link active">Scanner</a></li>
+        <li><a href="#database" class="nav-link">E-Database</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container">
+      <h1>Instant Halal & Haram Food Checker</h1>
+      <p>Analyze ingredients, scan product barcodes, and verify food additives (E-numbers) instantly with confidence.</p>
+    </div>
+  </section>
+
+  <!-- Main Content Layout -->
+  <main class="container">
+    <div class="main-grid">
+      
+      <!-- Left Column: Scanner & Checker -->
+      <div>
+        <div class="card">
+          <h3><i class="ri-scan-2-line"></i> Verify Product Ingredients</h3>
+          
+          <!-- Mode Tabs -->
+          <div class="scanner-tabs">
+            <button class="tab-btn active" data-tab="textTab">Paste Ingredients</button>
+            <button class="tab-btn" data-tab="barcodeTab">Barcode Scanner</button>
+          </div>
+
+          <!-- Tab 1: Text Ingredients Checker -->
+          <div id="textTabContent" class="tab-content">
+            <div class="form-group">
+              <label for="ingredientInput">Enter or paste product ingredients list:</label>
+              <textarea id="ingredientInput" placeholder="e.g., Sugar, Water, Gelatin, Natural Flavors, E441, Lecithin..."></textarea>
+            </div>
+            <button id="analyzeBtn" class="btn">
+              <i class="ri-search-eye-line"></i> Analyze Ingredients
+            </button>
+          </div>
+
+          <!-- Tab 2: Barcode Lookup Simulation -->
+          <div id="barcodeTabContent" class="tab-content hidden">
+            <div class="barcode-box">
+              <i class="ri-barcode-line"></i>
+              <p>Select a sample product barcode below to test instant lookup:</p>
+              <div class="sample-barcodes">
+                <button class="badge-chip" data-barcode="6291001350106">Al Islami Chicken Nuggets</button>
+                <button class="badge-chip" data-barcode="5449000000996">Coca-Cola Classic</button>
+                <button class="badge-chip" data-barcode="7622210449283">Milka Strawberry Chocolate (Contains E120)</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Analysis Results Display -->
+          <div id="resultBox" class="result-box">
+            <div class="result-header" id="resultHeader">
+              <i id="resultIcon"></i>
+              <span id="resultTitle">Analysis Result</span>
+            </div>
+            <p id="resultDescription">Detailed breakdown will appear here.</p>
+            <ul id="flaggedList" class="flagged-list"></ul>
+          </div>
+        </div>
+
+        <!-- E-Numbers Reference Database Section -->
+        <div class="card" id="database">
+          <h3><i class="ri-booklet-line"></i> E-Number Additives Directory</h3>
+          <div class="search-sm">
+            <input type="text" id="enumberSearch" placeholder="Search additive code or name (e.g., E120, Gelatin)..." />
+          </div>
+          <div class="enumber-list" id="enumberListContainer">
+            <!-- Dynamically populated via JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Scan History & Quick Info -->
+      <div>
+        <div class="card">
+          <h3><i class="ri-history-line"></i> Recent Scans</h3>
+          <ul id="historyList" class="history-list">
+            <!-- Dynamically populated via JS -->
+          </ul>
+          <button id="clearHistoryBtn" class="clear-history hidden">Clear History</button>
+        </div>
+
+        <div class="card">
+          <h3><i class="ri-information-line"></i> Halal Guidelines</h3>
+          <p style="font-size: 0.88rem; color: var(--gray-600); margin-bottom: 0.75rem;">
+            <strong>Halal:</strong> Permissible ingredients such as plant-based items, fish, and properly slaughtered Zabiha meat.
+          </p>
+          <p style="font-size: 0.88rem; color: var(--gray-600); margin-bottom: 0.75rem;">
+            <strong>Haram:</strong> Prohibited ingredients including pork, alcohol, carnivorous animals, and animal-derived additives from non-halal slaughter.
+          </p>
+          <p style="font-size: 0.88rem; color: var(--gray-600);">
+            <strong>Mashbooh (Doubtful):</strong> Additives or ingredients whose status depends on source origin (e.g., animal vs. synthetic enzymes).
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <p>&copy; 2026 HalalScanner. Built for clean and conscious dietary choices.</p>
+    </div>
+  </footer>
+
+  <!-- JavaScript Application Logic -->
+  <script>
+    // Database of Harmful/Doubtful Additives & Ingredients
+    const hazardousIngredients = {
+      // Haram items
+      'gelatin': { status: 'haram', reason: 'Often derived from pork or non-halal bovine sources unless explicitly certified plant/halal.' },
+      'pork': { status: 'haram', reason: 'Strictly forbidden (Haram) in Islamic dietary law.' },
+      'bacon': { status: 'haram', reason: 'Pork product.' },
+      'ham': { status: 'haram', reason: 'Pork product.' },
+      'lard': { status: 'haram', reason: 'Pig fat.' },
+      'alcohol': { status: 'haram', reason: 'Intoxicants are forbidden.' },
+      'ethanol': { status: 'mashbooh', reason: 'Permissible in trace amounts as a solvent if non-intoxicating, but check certification.' },
+      'wine': { status: 'haram', reason: 'Intoxicating beverage.' },
+      'beer': { status: 'haram', reason: 'Intoxicating beverage.' },
+      'carmine': { status: 'haram', reason: 'Natural red food dye (E120) extracted from cochineal insects (considered impermissible by most scholars).' },
+      'e120': { status: 'haram', reason: 'Cochineal / Carmine insect-based coloring.' },
+      'e441': { status: 'haram', reason: 'Gelatin additive.' },
+      
+      // Mashbooh / Doubtful items
+      'rennet': { status: 'mashbooh', reason: 'Enzyme used in cheese making; may be animal-derived or microbial.' },
+      'pepsin': { status: 'mashbooh', reason: 'Stomach enzyme; source must be verified.' },
+      'glycerin': { status: 'mashbooh', reason: 'Can be derived from animal fat or plant oils.' },
+      'glycerol': { status: 'mashbooh', reason: 'Can be derived from animal fat or plant oils.' },
+      'emulsifier': { status: 'mashbooh', reason: 'May originate from plant or animal fats (E471, etc.).' },
+      'e471': { status: 'mashbooh', reason: 'Mono- and diglycerides of fatty acids (potential animal fat source).' },
+      'e542': { status: 'mashbooh', reason: 'Bone phosphate (derived from animal bones).' }
+    };
+
+    // E-Number Reference Directory
+    const eNumberDatabase = [
+      { code: 'E100', name: 'Curcumin (Turmeric)', status: 'halal' },
+      { code: 'E120', name: 'Carmine / Cochineal', status: 'haram', note: 'Insect-derived dye' },
+      { code: 'E140', name: 'Chlorophylls', status: 'halal' },
+      { code: 'E160a', name: 'Carotenes', status: 'halal' },
+      { code: 'E322', name: 'Lecithins (Soy/Sunflower)', status: 'halal' },
+      { code: 'E422', name: 'Glycerol', status: 'doubtful', note: 'May be animal/plant origin' },
+      { code: 'E441', name: 'Gelatin', status: 'haram', note: 'Usually non-halal animal bone/skin' },
+      { code: 'E471', name: 'Mono- and diglycerides', status: 'doubtful', note: 'Check source fat' },
+      { code: 'E542', name: 'Bone Phosphate', status: 'doubtful', note: 'Animal bone derivative' }
+    ];
+
+    // Preloaded Mock Barcodes for Testing
+    const mockProducts = {
+      '6291001350106': { name: 'Al Islami Chicken Nuggets', text: 'Chicken meat, water, breadcrumbs, vegetable oil, spices. Halal certified.' },
+      '5449000000996': { name: 'Coca-Cola Classic', text: 'Carbonated water, sugar, color (caramel E150d), phosphoric acid, natural flavorings, caffeine.' },
+      '7622210449283': { name: 'Milka Strawberry Chocolate', text: 'Sugar, palm oil, cocoa butter, skimmed milk powder, whey powder, strawberry pieces, E120 carmine coloring, emulsifier E471.' }
+    };
+
+    // DOM Elements
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const textTabContent = document.getElementById('textTabContent');
+    const barcodeTabContent = document.getElementById('barcodeTabContent');
+    const analyzeBtn = document.getElementById('analyzeBtn');
+    const ingredientInput = document.getElementById('ingredientInput');
+    const resultBox = document.getElementById('resultBox');
+    const resultHeader = document.getElementById('resultHeader');
+    const resultIcon = document.getElementById('resultIcon');
+    const resultTitle = document.getElementById('resultTitle');
+    const resultDescription = document.getElementById('resultDescription');
+    const flaggedList = document.getElementById('flaggedList');
+    
+    const enumberSearch = document.getElementById('enumberSearch');
+    const enumberListContainer = document.getElementById('enumberListContainer');
+    const historyList = document.getElementById('historyList');
+    const clearHistoryBtn = document.getElementById('clearHistoryBtn');
+    const sampleBarcodeBtns = document.querySelectorAll('.badge-chip');
+
+    // Switch Tabs
+    tabBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        tabBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        
+        if(btn.dataset.tab === 'textTab') {
+          textTabContent.classList.remove('hidden');
+          barcodeTabContent.classList.add('hidden');
+        } else {
+          textTabContent.classList.add('hidden');
+          barcodeTabContent.classList.remove('hidden');
+        }
+      });
+    });
+
+    // Render E-Number Directory
+    function renderENumberList(filter = '') {
+      enumberListContainer.innerHTML = '';
+      const filtered = eNumberDatabase.filter(item => 
+        item.code.toLowerCase().includes(filter.toLowerCase()) || 
+        item.name.toLowerCase().includes(filter.toLowerCase())
+      );
+
+      if(filtered.length === 0) {
+        enumberListContainer.innerHTML = '<p style="padding: 1rem; text-align: center; color: var(--gray-600);">No matching additives found.</p>';
+        return;
+      }
+
+      filtered.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'enumber-item';
+        div.innerHTML = `
+          <div>
+            <strong>${item.code}</strong> - ${item.name}
+            ${item.note ? `<br><small style="color:var(--gray-600);">${item.note}</small>` : ''}
+          </div>
+          <span class="status-tag ${item.status}">${item.status}</span>
+        `;
+        enumberListContainer.appendChild(div);
+      });
+    }
+
+    enumberSearch.addEventListener('input', (e) => {
+      renderENumberList(e.target.value);
+    });
+
+    // Core Analysis Engine
+    function analyzeText(rawText, productName = 'Custom Ingredients') {
+      const cleanedText = rawText.toLowerCase();
+      let foundHaram = [];
+      let foundMashbooh = [];
+
+      for(let key in hazardousIngredients) {
+        // Match whole words or substrings cleanly
+        if(cleanedText.includes(key)) {
+          const info = hazardousIngredients[key];
+          const entryObj = { term: key, ...info };
+          
+          if(info.status === 'haram') {
+            if(!foundHaram.some(i => i.term === key)) foundHaram.push(entryObj);
+          } else if(info.status === 'mashbooh') {
+            if(!foundMashbooh.some(i => i.term === key)) foundMashbooh.push(entryObj);
+          }
+        }
+      }
+
+      // Determine overall status
+      let overallStatus = 'halal';
+      if(foundHaram.length > 0) overallStatus = 'haram';
+      else if(foundMashbooh.length > 0) overallStatus = 'mashbooh';
+
+      displayResult(productName, overallStatus, foundHaram, foundMashbooh);
+      saveToHistory(productName, overallStatus);
+    }
+
+    // Display Results
+    function displayResult(title, status, haramList, mashboohList) {
+      resultBox.style.display = 'block';
+      resultBox.className = `result-box ${status}`;
+      flaggedList.innerHTML = '';
+
+      if(status === 'halal') {
+        resultIcon.className = 'ri-checkbox-circle-fill';
+        resultTitle.textContent = `${title} — Appears Halal`;
+        resultDescription.textContent = 'No haram or suspicious ingredients were detected in this product profile.';
+      } else if(status === 'haram') {
+        resultIcon.className = 'ri-close-circle-fill';
+        resultTitle.textContent = `${title} — Not Halal (Haram)`;
+        resultDescription.textContent = 'This product contains prohibited ingredients or non-compliant additives:';
+        haramList.forEach(item => {
+          const li = document.createElement('li');
+          li.innerHTML = `<strong>${item.term.toUpperCase()}</strong>: ${item.reason}`;
+          flaggedList.appendChild(li);
+        });
+      } else {
+        resultIcon.className = 'ri-alert-fill';
+        resultTitle.textContent = `${title} — Doubtful (Mashbooh)`;
+        resultDescription.textContent = 'This product contains ingredients that require clarification or verification of their source:';
+        mashboohList.forEach(item => {
+          const li = document.createElement('li');
+          li.innerHTML = `<strong>${item.term.toUpperCase()}</strong>: ${item.reason}`;
+          flaggedList.appendChild(li);
+        });
+      }
+    }
+
+    // Analyze Button Event
+    analyzeBtn.addEventListener('click', () => {
+      const text = ingredientInput.value.trim();
+      if(!text) {
+        alert('Please enter or paste ingredients list first.');
+        return;
+      }
+      analyzeText(text, 'Custom Product');
+    });
+
+    // Sample Barcode Click Simulation
+    sampleBarcodeBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const code = btn.dataset.barcode;
+        const product = mockProducts[code];
+        if(product) {
+          analyzeText(product.text, product.name);
+        }
+      });
+    });
+
+    // History LocalStorage Management
+    function getHistory() {
+      try {
+        return JSON.parse(localStorage.getItem('halal_scan_history')) || [];
+      } catch {
+        return [];
+      }
+    }
+
+    function saveToHistory(name, status) {
+      let history = getHistory();
+      // Avoid duplicate consecutive entries
+      history.unshift({ name, status, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) });
+      if(history.length > 10) history = history.slice(0, 10);
+      localStorage.setItem('halal_scan_history', JSON.stringify(history));
+      renderHistory();
+    }
+
+    function renderHistory() {
+      const history = getHistory();
+      historyList.innerHTML = '';
+      
+      if(history.length === 0) {
+        historyList.innerHTML = '<p style="font-size: 0.88rem; color: var(--gray-600); text-align: center; padding: 1rem 0;">No recent scans yet.</p>';
+        clearHistoryBtn.classList.add('hidden');
+        return;
+      }
+
+      clearHistoryBtn.classList.remove('hidden');
+      history.forEach(item => {
+        const li = document.createElement('li');
+        li.className = 'history-item';
+        li.innerHTML = `
+          <span>${item.name}</span>
+          <span class="status-tag ${item.status}">${item.status}</span>
+        `;
+        historyList.appendChild(li);
+      });
+    }
+
+    clearHistoryBtn.addEventListener('click', () => {
+      localStorage.removeItem('halal_scan_history');
+      renderHistory();
+    });
+
+    // Initialize initial views on load
+    renderENumberList();
+    renderHistory();
+  </script>
+</body>
+</html>
